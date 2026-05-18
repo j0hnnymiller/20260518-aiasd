@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1020;
+        --bg-2: #121a33;
+        --panel: rgba(18, 26, 51, 0.82);
+        --panel-border: rgba(255, 255, 255, 0.1);
+        --text: #f4f7ff;
+        --muted: #9ca8c7;
+        --accent: #6ee7ff;
+        --accent-strong: #7c8cff;
+        --danger: #ff7b8a;
+        --key: #18213d;
+        --key-hover: #223055;
+        --key-operator: #24345f;
+        --key-operator-hover: #2f4580;
+        --key-equals: linear-gradient(135deg, #6ee7ff, #7c8cff);
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(110, 231, 255, 0.2),
+            transparent 28%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(59, 130, 246, 0.22),
+            transparent 30%
+          ),
+          linear-gradient(135deg, #0b1f4d, #123a8c 55%, #1d4ed8);
+        padding: 24px;
+      }
+
+      .calculator {
+        width: min(100%, 420px);
+        border: 1px solid var(--panel-border);
+        border-radius: 28px;
+        background: var(--panel);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .header {
+        padding: 22px 22px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 1.05rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .brand p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .memory-indicator {
+        min-width: 32px;
+        text-align: right;
+        color: var(--accent);
+        font-size: 0.9rem;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.18s ease;
+      }
+
+      .memory-indicator.active {
+        opacity: 1;
+      }
+
+      .display {
+        padding: 12px 22px 18px;
+      }
+
+      .history {
+        min-height: 24px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        text-align: right;
+        overflow-wrap: anywhere;
+      }
+
+      .result {
+        min-height: 64px;
+        margin-top: 8px;
+        display: flex;
+        align-items: end;
+        justify-content: flex-end;
+        font-size: clamp(2rem, 6vw, 3.2rem);
+        font-weight: 700;
+        text-align: right;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+
+      .keys {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding: 18px 22px 22px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0)
+        );
+      }
+
+      .memory-keys {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        padding: 0 22px 12px;
+      }
+
+      .trig-keys {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 0 22px 12px;
+      }
+
+      button {
+        appearance: none;
+        border: 0;
+        border-radius: 18px;
+        min-height: 64px;
+        color: var(--text);
+        font: inherit;
+        font-size: 1.08rem;
+        font-weight: 600;
+        background: var(--key);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        transition:
+          transform 0.08s ease,
+          background 0.18s ease,
+          box-shadow 0.18s ease;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      button:hover {
+        background: var(--key-hover);
+      }
+
+      button:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .operator {
+        background: var(--key-operator);
+      }
+
+      .operator:hover {
+        background: var(--key-operator-hover);
+      }
+
+      .danger {
+        color: #ffd8de;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 123, 138, 0.24),
+          rgba(255, 123, 138, 0.15)
+        );
+      }
+
+      .equals {
+        background: var(--key-equals);
+        color: #08111f;
+        box-shadow: 0 12px 24px rgba(110, 231, 255, 0.2);
+      }
+
+      .memory-button {
+        min-height: 48px;
+        border-radius: 14px;
+        font-size: 0.92rem;
+      }
+
+      .mode-button.active {
+        background: var(--accent);
+        color: #08111f;
+      }
+
+      .span-2 {
+        grid-column: span 2;
+      }
+
+      .hint {
+        padding: 0 22px 22px;
+        color: var(--muted);
+        font-size: 0.85rem;
+        text-align: center;
+      }
+
+      @media (max-width: 420px) {
+        .calculator {
+          border-radius: 24px;
+        }
+
+        .keys {
+          gap: 10px;
+          padding: 16px;
+        }
+
+        .display,
+        .header {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        button {
+          min-height: 58px;
+          border-radius: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="calculator" aria-label="Calculator">
+      <div class="header">
+        <div class="brand">
+          <h1>Calculator</h1>
+          <p>Keyboard ready • Press A for circle area</p>
+        </div>
+        <div class="memory-indicator" id="memory-indicator">M</div>
+      </div>
+
+      <section class="display" aria-live="polite">
+        <div class="history" id="history">&nbsp;</div>
+        <div class="result" id="result">0</div>
+      </section>
+
+      <section class="memory-keys" aria-label="Calculator memory keys">
+        <button class="operator memory-button" data-action="memory-clear">
+          MC
+        </button>
+        <button class="operator memory-button" data-action="memory-recall">
+          MR
+        </button>
+        <button class="operator memory-button" data-action="memory-add">
+          M+
+        </button>
+        <button class="operator memory-button" data-action="memory-subtract">
+          M-
+        </button>
+        <button class="operator memory-button" data-action="memory-store">
+          MS
+        </button>
+      </section>
+
+      <section class="trig-keys" aria-label="Calculator trigonometric keys">
+        <button class="operator memory-button" data-action="trig-sin">
+          sin
+        </button>
+        <button class="operator memory-button" data-action="trig-cos">
+          cos
+        </button>
+        <button class="operator memory-button" data-action="trig-tan">
+          tan
+        </button>
+        <button
+          class="operator memory-button mode-button"
+          data-action="toggle-angle-mode"
+          id="angle-mode-button"
+        >
+          DEG
+        </button>
+      </section>
+
+      <section class="keys" aria-label="Calculator keys">
+        <button class="danger" data-action="clear">AC</button>
+        <button class="operator" data-action="backspace">⌫</button>
+        <button class="operator" data-action="circle-area">A(r)</button>
+        <button class="operator" data-action="percent">%</button>
+        <button class="operator" data-value="/">÷</button>
+
+        <button data-value="7">7</button>
+        <button data-value="8">8</button>
+        <button data-value="9">9</button>
+        <button class="operator" data-value="*">×</button>
+
+        <button data-value="4">4</button>
+        <button data-value="5">5</button>
+        <button data-value="6">6</button>
+        <button class="operator" data-value="-">−</button>
+
+        <button data-value="1">1</button>
+        <button data-value="2">2</button>
+        <button data-value="3">3</button>
+        <button class="operator" data-value="+">+</button>
+
+        <button data-value="0">0</button>
+        <button data-value=".">.</button>
+        <button class="equals" data-action="equals">=</button>
+      </section>
+
+      <div class="hint">
+        Use the number keys, operators, memory keys, Enter, Backspace, Esc, and
+        A. Trig functions use the selected angle mode.
+      </div>
+    </main>
+
+    <script>
+      const historyEl = document.getElementById("history");
+      const resultEl = document.getElementById("result");
+      const memoryIndicatorEl = document.getElementById("memory-indicator");
+      const angleModeButtonEl = document.getElementById("angle-mode-button");
+      const buttons = document.querySelectorAll("button");
+
+      let expression = "";
+      let displayExpression = "";
+      let lastResult = "0";
+      let justEvaluated = false;
+      let memoryValue = null;
+      let angleMode = "deg";
+
+      function render() {
+        historyEl.textContent = displayExpression || "\u00A0";
+        resultEl.textContent = lastResult;
+        memoryIndicatorEl.classList.toggle("active", memoryValue !== null);
+        angleModeButtonEl.textContent = angleMode.toUpperCase();
+        angleModeButtonEl.classList.toggle("active", angleMode === "deg");
+      }
+
+      function normalizeExpression(value) {
+        return value.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-");
+      }
+
+      function formatNumber(value) {
+        if (!Number.isFinite(value)) return "Error";
+        if (Number.isInteger(value)) return String(value);
+        const rounded = Number.parseFloat(value.toFixed(10));
+        return String(rounded);
+      }
+
+      function safeEvaluate(value) {
+        const normalized = normalizeExpression(value);
+        if (!/^[0-9+\-*/.()\s]+$/.test(normalized)) {
+          throw new Error("Invalid expression");
+        }
+        // Use Function with a strict character whitelist so only arithmetic is allowed.
+        return Function(`"use strict"; return (${normalized});`)();
+      }
+
+      function getCurrentValue() {
+        if (expression) {
+          return resolveExpressionValue();
+        }
+
+        const parsed = Number(lastResult);
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+
+      function appendValue(value) {
+        if (justEvaluated && /[0-9.]/.test(value)) {
+          expression = "";
+          displayExpression = "";
+        }
+
+        if (value === ".") {
+          const lastChunk = expression.split(/[+\-*/]/).pop();
+          if (lastChunk.includes(".")) return;
+          if (!lastChunk) {
+            expression += "0";
+          }
+        }
+
+        if ("+-*/".includes(value)) {
+          const trimmed = expression.trimEnd();
+          if (!trimmed && value !== "-") return;
+          if (/[+\-*/]$/.test(trimmed)) {
+            expression = trimmed.slice(0, -1) + value;
+          } else {
+            expression = trimmed + value;
+          }
+        } else {
+          expression += value;
+        }
+
+        justEvaluated = false;
+        displayExpression = "";
+        lastResult = expression || "0";
+        render();
+      }
+
+      function calculatePercentage() {
+        const source = expression || lastResult;
+        if (!source || source === "Error") return;
+
+        try {
+          const binaryMatch = expression.match(
+            /^(.*?)([+\-*/])(-?(?:\d+\.?\d*|\.\d+))$/,
+          );
+
+          if (binaryMatch) {
+            const [, leftExpression, operator, operandText] = binaryMatch;
+            const baseValue = safeEvaluate(leftExpression);
+            const operandValue = Number(operandText);
+
+            if (!Number.isFinite(baseValue) || !Number.isFinite(operandValue)) {
+              throw new Error("Invalid percentage");
+            }
+
+            const percentValue =
+              operator === "+" || operator === "-"
+                ? (baseValue * operandValue) / 100
+                : operandValue / 100;
+
+            expression = `${leftExpression}${operator}${formatNumber(percentValue)}`;
+            displayExpression = `${source}%`;
+            lastResult = formatNumber(percentValue);
+            justEvaluated = false;
+            render();
+            return;
+          }
+
+          const value = expression
+            ? resolveExpressionValue()
+            : Number(lastResult);
+          if (!Number.isFinite(value)) {
+            throw new Error("Invalid percentage");
+          }
+
+          expression = formatNumber(value / 100);
+          displayExpression = `${source}%`;
+          lastResult = expression;
+          justEvaluated = true;
+        } catch {
+          displayExpression = `${source}%`;
+          lastResult = "Error";
+          expression = "";
+          justEvaluated = true;
+        }
+
+        render();
+      }
+
+      function clearAll() {
+        expression = "";
+        displayExpression = "";
+        lastResult = "0";
+        justEvaluated = false;
+        render();
+      }
+
+      function backspace() {
+        if (justEvaluated) {
+          clearAll();
+          return;
+        }
+        expression = expression.slice(0, -1);
+        displayExpression = "";
+        lastResult = expression || "0";
+        render();
+      }
+
+      function resolveExpressionValue() {
+        if (!expression) return null;
+        return justEvaluated ? Number(expression) : safeEvaluate(expression);
+      }
+
+      function calculateCircleArea() {
+        if (!expression) return;
+
+        try {
+          const radius = resolveExpressionValue();
+          if (!Number.isFinite(radius) || radius < 0) {
+            throw new Error("Invalid radius");
+          }
+
+          const source = displayExpression.endsWith(" =")
+            ? displayExpression.slice(0, -2)
+            : expression;
+
+          displayExpression = `A(${source}) =`;
+          lastResult = formatNumber(Math.PI * radius * radius);
+          expression = lastResult === "Error" ? "" : lastResult;
+          justEvaluated = true;
+        } catch {
+          displayExpression = `A(${expression}) =`;
+          lastResult = "Error";
+          expression = "";
+          justEvaluated = true;
+        }
+
+        render();
+      }
+
+      function convertToRadians(value) {
+        return angleMode === "deg" ? (value * Math.PI) / 180 : value;
+      }
+
+      function applyTrigFunction(name) {
+        const source = expression || lastResult;
+        if (!source || source === "Error") return;
+
+        try {
+          const value = getCurrentValue();
+          if (!Number.isFinite(value)) {
+            throw new Error("Invalid trig input");
+          }
+
+          const input = convertToRadians(value);
+          const trigFunctions = {
+            sin: Math.sin,
+            cos: Math.cos,
+            tan: Math.tan,
+          };
+
+          const result = trigFunctions[name](input);
+          displayExpression = `${name}(${source} ${angleMode.toUpperCase()}) =`;
+          lastResult = formatNumber(result);
+          expression = lastResult === "Error" ? "" : lastResult;
+          justEvaluated = true;
+        } catch {
+          displayExpression = `${name}(${source}) =`;
+          lastResult = "Error";
+          expression = "";
+          justEvaluated = true;
+        }
+
+        render();
+      }
+
+      function toggleAngleMode() {
+        angleMode = angleMode === "deg" ? "rad" : "deg";
+        render();
+      }
+
+      function storeMemory() {
+        const value = getCurrentValue();
+        if (value === null) return;
+        memoryValue = value;
+        render();
+      }
+
+      function recallMemory() {
+        if (memoryValue === null) return;
+        expression = formatNumber(memoryValue);
+        displayExpression = "";
+        lastResult = expression;
+        justEvaluated = true;
+        render();
+      }
+
+      function clearMemory() {
+        memoryValue = null;
+        render();
+      }
+
+      function adjustMemory(delta) {
+        const value = getCurrentValue();
+        if (value === null) return;
+        memoryValue = (memoryValue ?? 0) + delta;
+        render();
+      }
+
+      function evaluate() {
+        if (!expression) return;
+        try {
+          const result = safeEvaluate(expression);
+          displayExpression = expression + " =";
+          lastResult = formatNumber(result);
+          expression = lastResult === "Error" ? "" : lastResult;
+          justEvaluated = true;
+        } catch {
+          displayExpression = expression + " =";
+          lastResult = "Error";
+          expression = "";
+          justEvaluated = true;
+        }
+        render();
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const { action, value } = button.dataset;
+          if (action === "clear") clearAll();
+          else if (action === "backspace") backspace();
+          else if (action === "circle-area") calculateCircleArea();
+          else if (action === "percent") calculatePercentage();
+          else if (action === "trig-sin") applyTrigFunction("sin");
+          else if (action === "trig-cos") applyTrigFunction("cos");
+          else if (action === "trig-tan") applyTrigFunction("tan");
+          else if (action === "toggle-angle-mode") toggleAngleMode();
+          else if (action === "memory-clear") clearMemory();
+          else if (action === "memory-recall") recallMemory();
+          else if (action === "memory-add")
+            adjustMemory(getCurrentValue() ?? 0);
+          else if (action === "memory-subtract")
+            adjustMemory(-(getCurrentValue() ?? 0));
+          else if (action === "memory-store") storeMemory();
+          else if (action === "equals") evaluate();
+          else if (value) appendValue(value);
+        });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const { key } = event;
+        if (/^[0-9]$/.test(key)) {
+          appendValue(key);
+          return;
+        }
+        if (key === ".") {
+          appendValue(key);
+          return;
+        }
+        if (["+", "-", "*", "/", "%"].includes(key)) {
+          if (key === "%") {
+            calculatePercentage();
+            return;
+          }
+          appendValue(key);
+          return;
+        }
+        if (key.toLowerCase() === "a") {
+          event.preventDefault();
+          calculateCircleArea();
+          return;
+        }
+        if (key === "Enter" || key === "=") {
+          event.preventDefault();
+          evaluate();
+          return;
+        }
+        if (key === "Backspace") {
+          event.preventDefault();
+          backspace();
+          return;
+        }
+        if (key === "Escape") {
+          clearAll();
+        }
+      });
+
+      render();
+    </script>
+  </body>
+</html>
