@@ -43,12 +43,18 @@ source: "GitHub Copilot Chat"
 
 # AIASD Calculator Demo
 
-A small browser-based calculator demo built as a single self-contained HTML file, with a supporting presentation in the `slides` folder.
+A browser-based calculator demo built as a single self-contained HTML file, with supporting presentation assets, project prompts, and instruction files.
+
+**Audience**: Contributors and reviewers who need to run, understand, or extend the calculator demo and its repository documentation.
 
 ## Project Contents
 
-- `calculator.html`: Standalone calculator UI and logic written in plain HTML, CSS, and JavaScript.
-- `slides/20260518-aiasd-repos.pptx`: Presentation material associated with the project.
+- [`calculator.html`](calculator.html): Standalone calculator UI and logic written in plain HTML, CSS, and JavaScript.
+- [`docs/`](docs/): Contributor-facing project documentation, including the developer guide.
+- [`slides/`](slides/): Presentation assets (`20260518-aiasd-repos.pptx`, `aiasd-311-monday.pptx`).
+- [`.github/instructions/`](.github/instructions/): Repository instruction files for AI output policy, evergreen development, and language-specific authoring.
+- [`.github/prompts/`](.github/prompts/): Reusable prompt files for git commit grouping and technology inventory workflows.
+- [`ai-logs/`](ai-logs/): AI conversation and summary logs for documented artifact creation sessions.
 
 ## Features
 
@@ -66,6 +72,18 @@ No build step is required.
 
 1. Open `calculator.html` in a web browser.
 2. Use the on-screen controls or keyboard shortcuts.
+
+### Validation
+
+- Verify the calculator display updates when entering digits and operators.
+- Verify `Enter` evaluates the current expression.
+- Verify `Esc` clears input and resets the display state.
+
+### Troubleshooting
+
+- If nothing responds, confirm JavaScript is enabled in the browser.
+- If keyboard input does not work, click inside the page once to ensure focus.
+- If changes are not visible, hard refresh the browser to bypass cache.
 
 ## Implementation Notes
 
@@ -97,13 +115,13 @@ No build step is required.
 
 ### Project Tooling
 
-- GitHub repository instructions in `.github/instructions`
-- AI provenance logging in `ai-logs`
-- Markdown documentation in `README.md`
+- GitHub repository instructions in [`.github/instructions`](.github/instructions/)
+- AI provenance logging in [`ai-logs`](ai-logs/)
+- Markdown documentation in [`README.md`](README.md)
 
 ### Documentation Assets
 
-- PowerPoint slide deck in `slides/20260518-aiasd-repos.pptx`
+- PowerPoint slide decks in `slides/20260518-aiasd-repos.pptx` and `slides/aiasd-311-monday.pptx`
 
 ### What Is Not Used
 
@@ -115,11 +133,20 @@ No build step is required.
 
 ## AI-Assisted Artifacts
 
-- `README.md`: Project overview and usage notes. AI log: `ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`
-- `.github/instructions/evergreen-software-development.instructions.md`: Evergreen engineering guidance for maintainable software changes. AI log: `ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`
-- `.github/instructions/html.instructions.md`: HTML authoring guidance for semantic, accessible browser markup. AI log: `ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`
-- `.github/instructions/css.instructions.md`: CSS authoring guidance for maintainable styling and responsive layout. AI log: `ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`
-- `.github/instructions/javascript.instructions.md`: JavaScript authoring guidance for explicit state, rendering, and event handling. AI log: `ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`
+- `README.md`: Project overview and usage notes. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `docs/developer-guide.md`: Contributor guide for setup, workflow, validation, and troubleshooting. AI log: [`ai-logs/2026/05/19/ff1412ec-1440-4c21-a97e-d7f21445cab9/conversation.md`](ai-logs/2026/05/19/ff1412ec-1440-4c21-a97e-d7f21445cab9/conversation.md)
+- `.github/instructions/ai-assisted-output.instructions.md`: Repository policy for AI provenance, logging, and compliance requirements. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `.github/instructions/evergreen-software-development.instructions.md`: Evergreen engineering guidance for maintainable software changes. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `.github/instructions/html.instructions.md`: HTML authoring guidance for semantic, accessible browser markup. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `.github/instructions/css.instructions.md`: CSS authoring guidance for maintainable styling and responsive layout. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `.github/instructions/javascript.instructions.md`: JavaScript authoring guidance for explicit state, rendering, and event handling. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `.github/prompts/git-commit-logical-groups.prompt.md`: Agent prompt for grouping workspace changes into logical commits with safe git workflow checks. AI log: [`ai-logs/2026/05/19/f484659e-32e1-441a-958c-e33d2d7925f1/conversation.md`](ai-logs/2026/05/19/f484659e-32e1-441a-958c-e33d2d7925f1/conversation.md)
+- `.github/prompts/project-tech-stack-inventory.prompt.md`: Agent prompt for generating an evidence-based inventory of technologies, frameworks, and tools in the repository. AI log: [`ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md`](ai-logs/2026/05/18/acaf6075-7dde-4cc7-b293-0829934f7cc3/conversation.md)
+- `.github/prompts/documentation-instruction-file-generator.prompt.md`: Agent prompt for generating a repository documentation instruction file with standards, structure, and compliance requirements. AI log: [`ai-logs/2026/05/19/950941c4-4c36-4ba9-b757-4c9539968e87/conversation.md`](ai-logs/2026/05/19/950941c4-4c36-4ba9-b757-4c9539968e87/conversation.md)
+- `.github/prompts/test-driven-development-instruction-file-generator.prompt.md`: Agent prompt for regenerating the repository TDD instruction file with strict Red-Green-Refactor and unit-test requirements. AI log: [`ai-logs/2026/05/20/f62cf86f-6857-4562-8b9d-46319d02acd9/conversation.md`](ai-logs/2026/05/20/f62cf86f-6857-4562-8b9d-46319d02acd9/conversation.md)
+- `.github/instructions/documentation.instructions.md`: Canonical repository documentation authoring, linking, and maintenance standards for Markdown docs. AI log: [`ai-logs/2026/05/19/aae6cce1-78ed-4c45-a2fc-36cb511a2fba/conversation.md`](ai-logs/2026/05/19/aae6cce1-78ed-4c45-a2fc-36cb511a2fba/conversation.md)
+- `.github/instructions/test-driven-development.instructions.md`: Repository guidance for Red-Green-Refactor workflow, test design, and TDD quality gates. AI log: [`ai-logs/2026/05/20/380dcaef-538d-40bf-9b00-5036801ca53a/conversation.md`](ai-logs/2026/05/20/380dcaef-538d-40bf-9b00-5036801ca53a/conversation.md)
+- Additional project instruction artifacts currently present in [`.github/instructions/`](.github/instructions/): `chatmode-file.instructions.md`, `instruction-files.instructions.md`, `instruction-prompt-files.instructions.md`, and `prompt-file.instructions.md`.
 
 ## Instructions
 
