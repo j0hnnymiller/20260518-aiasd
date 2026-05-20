@@ -110,6 +110,9 @@ This document defines evergreen software development practices for this reposito
 - Cover edge cases that usually break aging code: invalid input, empty state, rounding, overflow, and unsupported combinations.
 - Prefer narrow validation first: the changed behavior, then the affected typecheck, lint, or build step.
 - If no automated test exists for a critical code path, add one when the change increases long-term complexity.
+- Before structural refactors, add a failing characterization test at the seam you intend to introduce or preserve.
+- When logic and UI are mixed, prefer introducing a testable seam before broad code movement.
+- Do not treat an already-green suite as evidence that a new refactor target has completed the Red step.
 
 ## Documentation Expectations
 

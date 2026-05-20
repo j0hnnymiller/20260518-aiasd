@@ -46,6 +46,8 @@ These instructions apply to all JavaScript code, whether embedded in HTML files 
 ### 2. Modularize Code
 
 - Split code into smaller, reusable modules.
+- Move non-trivial business logic behind an importable or otherwise directly testable module boundary.
+- Treat inline DOM scripts as UI adapters; keep calculator rules, state transitions, and validation logic in testable seams.
 - Example:
   ```javascript
   export function calculateSum(a, b) {
@@ -105,6 +107,8 @@ These instructions apply to all JavaScript code, whether embedded in HTML files 
 ### 7. Write Tests
 
 - Add unit tests for critical functions.
+- Add a failing test before the first production edit for new behavior, bug fixes, and structural refactors.
+- When extracting logic from UI code, add characterization tests first and preserve them while moving the code.
 - Example:
   ```javascript
   describe("calculateSum", () => {
@@ -131,6 +135,10 @@ These instructions apply to all JavaScript code, whether embedded in HTML files 
 5. **Ignoring Errors**
    - Always handle errors explicitly.
 
+6. **Hiding Business Logic In UI Wiring**
+
+- Do not leave domain logic trapped inside event listeners or page-local script state when it can be moved to a testable module seam.
+
 ## Quality Checklist
 
 - [ ] Are `const` and `let` used instead of `var`?
@@ -141,6 +149,8 @@ These instructions apply to all JavaScript code, whether embedded in HTML files 
 - [ ] Is the code optimized for performance?
 - [ ] Are there no hardcoded values?
 - [ ] Are there unit tests for critical functions?
+- [ ] Is non-trivial logic available through a direct testable seam?
+- [ ] Was a failing automated test added or updated before the first production edit?
 
 ---
 
