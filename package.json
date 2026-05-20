@@ -1,0 +1,27 @@
+{
+  "name": "20260518-aiasd",
+  "version": "1.0.0",
+  "description": "---\r ai_generated: true\r model: \"openai/gpt-5.4@unknown\"\r operator: \"johnmillerATcodemag-com\"\r chat_id: \"acaf6075-7dde-4cc7-b293-0829934f7cc3\"\r prompt: |\r   create a read me file for this project",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j0hnnymiller/20260518-aiasd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/j0hnnymiller/20260518-aiasd/issues"
+  },
+  "homepage": "https://github.com/j0hnnymiller/20260518-aiasd#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}
