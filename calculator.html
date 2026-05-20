@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculator</title>
     <style>
+      /* Design tokens keep the visual theme consistent across controls and states. */
       :root {
         color-scheme: dark;
         --bg: #0b1020;
@@ -35,6 +36,7 @@
         place-items: center;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: var(--text);
+        /* Layered gradients create depth while keeping the UI lightweight. */
         background:
           radial-gradient(
             circle at top left,
@@ -229,6 +231,7 @@
       }
 
       @media (max-width: 420px) {
+        /* Tighten spacing and hit targets for smaller screens. */
         .calculator {
           border-radius: 24px;
         }
@@ -336,336 +339,98 @@
       </div>
     </main>
 
+    <script src="calculator-engine.js"></script>
     <script>
       const historyEl = document.getElementById("history");
       const resultEl = document.getElementById("result");
       const memoryIndicatorEl = document.getElementById("memory-indicator");
       const angleModeButtonEl = document.getElementById("angle-mode-button");
       const buttons = document.querySelectorAll("button");
+      const engine = createCalculatorEngine();
 
-      let expression = "";
-      let displayExpression = "";
-      let lastResult = "0";
-      let justEvaluated = false;
-      let memoryValue = null;
-      let angleMode = "deg";
-
+      // Centralized UI rendering keeps state transitions predictable.
       function render() {
-        historyEl.textContent = displayExpression || "\u00A0";
-        resultEl.textContent = lastResult;
-        memoryIndicatorEl.classList.toggle("active", memoryValue !== null);
-        angleModeButtonEl.textContent = angleMode.toUpperCase();
-        angleModeButtonEl.classList.toggle("active", angleMode === "deg");
-      }
-
-      function normalizeExpression(value) {
-        return value.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-");
-      }
-
-      function formatNumber(value) {
-        if (!Number.isFinite(value)) return "Error";
-        if (Number.isInteger(value)) return String(value);
-        const rounded = Number.parseFloat(value.toFixed(10));
-        return String(rounded);
-      }
-
-      function safeEvaluate(value) {
-        const normalized = normalizeExpression(value);
-        if (!/^[0-9+\-*/.()\s]+$/.test(normalized)) {
-          throw new Error("Invalid expression");
-        }
-        // Use Function with a strict character whitelist so only arithmetic is allowed.
-        return Function(`"use strict"; return (${normalized});`)();
-      }
-
-      function getCurrentValue() {
-        if (expression) {
-          return resolveExpressionValue();
-        }
-
-        const parsed = Number(lastResult);
-        return Number.isFinite(parsed) ? parsed : null;
-      }
-
-      function appendValue(value) {
-        if (justEvaluated && /[0-9.]/.test(value)) {
-          expression = "";
-          displayExpression = "";
-        }
-
-        if (value === ".") {
-          const lastChunk = expression.split(/[+\-*/]/).pop();
-          if (lastChunk.includes(".")) return;
-          if (!lastChunk) {
-            expression += "0";
-          }
-        }
-
-        if ("+-*/".includes(value)) {
-          const trimmed = expression.trimEnd();
-          if (!trimmed && value !== "-") return;
-          if (/[+\-*/]$/.test(trimmed)) {
-            expression = trimmed.slice(0, -1) + value;
-          } else {
-            expression = trimmed + value;
-          }
-        } else {
-          expression += value;
-        }
-
-        justEvaluated = false;
-        displayExpression = "";
-        lastResult = expression || "0";
-        render();
-      }
-
-      function calculatePercentage() {
-        const source = expression || lastResult;
-        if (!source || source === "Error") return;
-
-        try {
-          const binaryMatch = expression.match(
-            /^(.*?)([+\-*/])(-?(?:\d+\.?\d*|\.\d+))$/,
-          );
-
-          if (binaryMatch) {
-            const [, leftExpression, operator, operandText] = binaryMatch;
-            const baseValue = safeEvaluate(leftExpression);
-            const operandValue = Number(operandText);
-
-            if (!Number.isFinite(baseValue) || !Number.isFinite(operandValue)) {
-              throw new Error("Invalid percentage");
-            }
-
-            const percentValue =
-              operator === "+" || operator === "-"
-                ? (baseValue * operandValue) / 100
-                : operandValue / 100;
-
-            expression = `${leftExpression}${operator}${formatNumber(percentValue)}`;
-            displayExpression = `${source}%`;
-            lastResult = formatNumber(percentValue);
-            justEvaluated = false;
-            render();
-            return;
-          }
-
-          const value = expression
-            ? resolveExpressionValue()
-            : Number(lastResult);
-          if (!Number.isFinite(value)) {
-            throw new Error("Invalid percentage");
-          }
-
-          expression = formatNumber(value / 100);
-          displayExpression = `${source}%`;
-          lastResult = expression;
-          justEvaluated = true;
-        } catch {
-          displayExpression = `${source}%`;
-          lastResult = "Error";
-          expression = "";
-          justEvaluated = true;
-        }
-
-        render();
-      }
-
-      function clearAll() {
-        expression = "";
-        displayExpression = "";
-        lastResult = "0";
-        justEvaluated = false;
-        render();
-      }
-
-      function backspace() {
-        if (justEvaluated) {
-          clearAll();
-          return;
-        }
-        expression = expression.slice(0, -1);
-        displayExpression = "";
-        lastResult = expression || "0";
-        render();
-      }
-
-      function resolveExpressionValue() {
-        if (!expression) return null;
-        return justEvaluated ? Number(expression) : safeEvaluate(expression);
-      }
-
-      function calculateCircleArea() {
-        if (!expression) return;
-
-        try {
-          const radius = resolveExpressionValue();
-          if (!Number.isFinite(radius) || radius < 0) {
-            throw new Error("Invalid radius");
-          }
-
-          const source = displayExpression.endsWith(" =")
-            ? displayExpression.slice(0, -2)
-            : expression;
-
-          displayExpression = `A(${source}) =`;
-          lastResult = formatNumber(Math.PI * radius * radius);
-          expression = lastResult === "Error" ? "" : lastResult;
-          justEvaluated = true;
-        } catch {
-          displayExpression = `A(${expression}) =`;
-          lastResult = "Error";
-          expression = "";
-          justEvaluated = true;
-        }
-
-        render();
-      }
-
-      function convertToRadians(value) {
-        return angleMode === "deg" ? (value * Math.PI) / 180 : value;
-      }
-
-      function applyTrigFunction(name) {
-        const source = expression || lastResult;
-        if (!source || source === "Error") return;
-
-        try {
-          const value = getCurrentValue();
-          if (!Number.isFinite(value)) {
-            throw new Error("Invalid trig input");
-          }
-
-          const input = convertToRadians(value);
-          const trigFunctions = {
-            sin: Math.sin,
-            cos: Math.cos,
-            tan: Math.tan,
-          };
-
-          const result = trigFunctions[name](input);
-          displayExpression = `${name}(${source} ${angleMode.toUpperCase()}) =`;
-          lastResult = formatNumber(result);
-          expression = lastResult === "Error" ? "" : lastResult;
-          justEvaluated = true;
-        } catch {
-          displayExpression = `${name}(${source}) =`;
-          lastResult = "Error";
-          expression = "";
-          justEvaluated = true;
-        }
-
-        render();
-      }
-
-      function toggleAngleMode() {
-        angleMode = angleMode === "deg" ? "rad" : "deg";
-        render();
-      }
-
-      function storeMemory() {
-        const value = getCurrentValue();
-        if (value === null) return;
-        memoryValue = value;
-        render();
-      }
-
-      function recallMemory() {
-        if (memoryValue === null) return;
-        expression = formatNumber(memoryValue);
-        displayExpression = "";
-        lastResult = expression;
-        justEvaluated = true;
-        render();
-      }
-
-      function clearMemory() {
-        memoryValue = null;
-        render();
-      }
-
-      function adjustMemory(delta) {
-        const value = getCurrentValue();
-        if (value === null) return;
-        memoryValue = (memoryValue ?? 0) + delta;
-        render();
-      }
-
-      function evaluate() {
-        if (!expression) return;
-        try {
-          const result = safeEvaluate(expression);
-          displayExpression = expression + " =";
-          lastResult = formatNumber(result);
-          expression = lastResult === "Error" ? "" : lastResult;
-          justEvaluated = true;
-        } catch {
-          displayExpression = expression + " =";
-          lastResult = "Error";
-          expression = "";
-          justEvaluated = true;
-        }
-        render();
+        const state = engine.getSnapshot();
+        historyEl.textContent = state.displayExpression || "\u00A0";
+        resultEl.textContent = state.lastResult;
+        memoryIndicatorEl.classList.toggle(
+          "active",
+          state.memoryValue !== null,
+        );
+        angleModeButtonEl.textContent = state.angleMode.toUpperCase();
+        angleModeButtonEl.classList.toggle("active", state.angleMode === "deg");
       }
 
       buttons.forEach((button) => {
         button.addEventListener("click", () => {
           const { action, value } = button.dataset;
-          if (action === "clear") clearAll();
-          else if (action === "backspace") backspace();
-          else if (action === "circle-area") calculateCircleArea();
-          else if (action === "percent") calculatePercentage();
-          else if (action === "trig-sin") applyTrigFunction("sin");
-          else if (action === "trig-cos") applyTrigFunction("cos");
-          else if (action === "trig-tan") applyTrigFunction("tan");
-          else if (action === "toggle-angle-mode") toggleAngleMode();
-          else if (action === "memory-clear") clearMemory();
-          else if (action === "memory-recall") recallMemory();
+          // Data-driven dispatch keeps button wiring declarative in markup.
+          if (action === "clear") engine.clearAll();
+          else if (action === "backspace") engine.backspace();
+          else if (action === "circle-area") engine.calculateCircleArea();
+          else if (action === "percent") engine.calculatePercentage();
+          else if (action === "trig-sin") engine.applyTrigFunction("sin");
+          else if (action === "trig-cos") engine.applyTrigFunction("cos");
+          else if (action === "trig-tan") engine.applyTrigFunction("tan");
+          else if (action === "toggle-angle-mode") engine.toggleAngleMode();
+          else if (action === "memory-clear") engine.clearMemory();
+          else if (action === "memory-recall") engine.recallMemory();
           else if (action === "memory-add")
-            adjustMemory(getCurrentValue() ?? 0);
+            engine.adjustMemory(engine.getCurrentValue() ?? 0);
           else if (action === "memory-subtract")
-            adjustMemory(-(getCurrentValue() ?? 0));
-          else if (action === "memory-store") storeMemory();
-          else if (action === "equals") evaluate();
-          else if (value) appendValue(value);
+            engine.adjustMemory(-(engine.getCurrentValue() ?? 0));
+          else if (action === "memory-store") engine.storeMemory();
+          else if (action === "equals") engine.evaluate();
+          else if (value) engine.appendValue(value);
+
+          render();
         });
       });
 
       document.addEventListener("keydown", (event) => {
         const { key } = event;
+        // Keyboard shortcuts mirror button behavior for parity and accessibility.
         if (/^[0-9]$/.test(key)) {
-          appendValue(key);
+          engine.appendValue(key);
+          render();
           return;
         }
         if (key === ".") {
-          appendValue(key);
+          engine.appendValue(key);
+          render();
           return;
         }
         if (["+", "-", "*", "/", "%"].includes(key)) {
           if (key === "%") {
-            calculatePercentage();
+            engine.calculatePercentage();
+            render();
             return;
           }
-          appendValue(key);
+          engine.appendValue(key);
+          render();
           return;
         }
         if (key.toLowerCase() === "a") {
           event.preventDefault();
-          calculateCircleArea();
+          engine.calculateCircleArea();
+          render();
           return;
         }
         if (key === "Enter" || key === "=") {
           event.preventDefault();
-          evaluate();
+          engine.evaluate();
+          render();
           return;
         }
         if (key === "Backspace") {
           event.preventDefault();
-          backspace();
+          engine.backspace();
+          render();
           return;
         }
         if (key === "Escape") {
-          clearAll();
+          engine.clearAll();
+          render();
         }
       });
 
