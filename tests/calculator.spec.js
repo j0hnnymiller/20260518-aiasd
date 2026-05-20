@@ -6,8 +6,8 @@ const calculatorUrl = pathToFileURL(
   path.resolve(__dirname, "..", "calculator.html"),
 ).toString();
 
-async function openCalculator(page) {
-  await page.goto(calculatorUrl);
+async function openCalculator(page, query = "") {
+  await page.goto(query ? `${calculatorUrl}${query}` : calculatorUrl);
 }
 
 async function clickMany(page, labels) {
@@ -109,5 +109,31 @@ test.describe("calculator regression characterization", () => {
     await page.getByRole("button", { name: "AC", exact: true }).click();
     await clickMany(page, ["6", "÷", "2", "="]);
     await expect(page.locator("#result")).toHaveText("3");
+  });
+
+  test("disables trigonometric controls with ff_trig=0", async ({ page }) => {
+    await openCalculator(page, "?ff_trig=0");
+
+    await expect(page.locator(".trig-keys")).toBeHidden();
+    await expect(page.locator('[data-action="trig-sin"]')).toBeHidden();
+  });
+
+  test("disables memory controls with ff_memory=0", async ({ page }) => {
+    await openCalculator(page, "?ff_memory=0");
+
+    await expect(page.locator(".memory-keys")).toBeHidden();
+    await expect(page.locator('[data-action="memory-store"]')).toBeHidden();
+  });
+
+  test("disables circle area action with ff_circle_area=0", async ({
+    page,
+  }) => {
+    await openCalculator(page, "?ff_circle_area=0");
+
+    await clickMany(page, ["2"]);
+    await page.keyboard.press("a");
+
+    await expect(page.locator("#result")).toHaveText("2");
+    await expect(page.locator('[data-action="circle-area"]')).toBeHidden();
   });
 });
