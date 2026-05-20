@@ -443,6 +443,14 @@
         "memory-store": () => engine.storeMemory(),
         equals: () => engine.evaluate(),
       };
+      const keyHandlers = {
+        ".": () => engine.appendValue("."),
+        "+": () => engine.appendValue("+"),
+        "-": () => engine.appendValue("-"),
+        "*": () => engine.appendValue("*"),
+        "/": () => engine.appendValue("/"),
+        "%": () => engine.calculatePercentage(),
+      };
 
       function dispatchButtonInput({ action, value }) {
         if (actionHandlers[action]) {
@@ -469,14 +477,6 @@
 
       document.addEventListener("keydown", (event) => {
         const { key } = event;
-        const keyHandlers = {
-          ".": () => engine.appendValue("."),
-          "+": () => engine.appendValue("+"),
-          "-": () => engine.appendValue("-"),
-          "*": () => engine.appendValue("*"),
-          "/": () => engine.appendValue("/"),
-          "%": () => engine.calculatePercentage(),
-        };
         // Keyboard shortcuts mirror button behavior for parity and accessibility.
         if (/^[0-9]$/.test(key)) {
           runAndRender(() => engine.appendValue(key));
