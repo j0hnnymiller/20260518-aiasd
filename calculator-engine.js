@@ -1,11 +1,27 @@
 (function (globalScope) {
-  function createCalculatorEngine() {
+  function createCalculatorEngine(options = {}) {
+    const defaults = {
+      trig: true,
+      memory: true,
+      circleArea: true,
+    };
+    const configuredFlags = options.featureFlags ?? {};
+    const featureFlags = {
+      trig: configuredFlags.trig ?? defaults.trig,
+      memory: configuredFlags.memory ?? defaults.memory,
+      circleArea: configuredFlags.circleArea ?? defaults.circleArea,
+    };
+
     let expression = "";
     let displayExpression = "";
     let lastResult = "0";
     let justEvaluated = false;
     let memoryValue = null;
     let angleMode = "deg";
+
+    function isFeatureEnabled(name) {
+      return featureFlags[name] !== false;
+    }
 
     function normalizeExpression(value) {
       return value.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-");
@@ -139,6 +155,7 @@
     }
 
     function calculateCircleArea() {
+      if (!isFeatureEnabled("circleArea")) return;
       if (!expression) return;
 
       try {
@@ -168,6 +185,7 @@
     }
 
     function applyTrigFunction(name) {
+      if (!isFeatureEnabled("trig")) return;
       const source = expression || lastResult;
       if (!source || source === "Error") return;
 
@@ -198,16 +216,19 @@
     }
 
     function toggleAngleMode() {
+      if (!isFeatureEnabled("trig")) return;
       angleMode = angleMode === "deg" ? "rad" : "deg";
     }
 
     function storeMemory() {
+      if (!isFeatureEnabled("memory")) return;
       const value = getCurrentValue();
       if (value === null) return;
       memoryValue = value;
     }
 
     function recallMemory() {
+      if (!isFeatureEnabled("memory")) return;
       if (memoryValue === null) return;
       expression = formatNumber(memoryValue);
       displayExpression = "";
@@ -216,10 +237,12 @@
     }
 
     function clearMemory() {
+      if (!isFeatureEnabled("memory")) return;
       memoryValue = null;
     }
 
     function adjustMemory(delta) {
+      if (!isFeatureEnabled("memory")) return;
       const value = getCurrentValue();
       if (value === null) return;
       memoryValue = (memoryValue ?? 0) + delta;
@@ -248,6 +271,7 @@
         lastResult,
         memoryValue,
         angleMode,
+        featureFlags: { ...featureFlags },
       };
     }
 

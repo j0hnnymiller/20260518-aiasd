@@ -223,6 +223,10 @@
         grid-column: span 2;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       .hint {
         padding: 0 22px 22px;
         color: var(--muted);
@@ -345,8 +349,70 @@
       const resultEl = document.getElementById("result");
       const memoryIndicatorEl = document.getElementById("memory-indicator");
       const angleModeButtonEl = document.getElementById("angle-mode-button");
+      const memorySectionEl = document.querySelector(".memory-keys");
+      const trigSectionEl = document.querySelector(".trig-keys");
+      const circleAreaButtonEl = document.querySelector(
+        '[data-action="circle-area"]',
+      );
       const buttons = document.querySelectorAll("button");
-      const engine = createCalculatorEngine();
+
+      function parseBooleanFlag(value) {
+        if (value === null || value === undefined) return null;
+        const normalized = String(value).toLowerCase();
+        if (["1", "true", "on", "yes"].includes(normalized)) return true;
+        if (["0", "false", "off", "no"].includes(normalized)) return false;
+        return null;
+      }
+
+      function loadStoredFlags() {
+        try {
+          const raw = localStorage.getItem("calculator.featureFlags");
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") return {};
+          return parsed;
+        } catch {
+          return {};
+        }
+      }
+
+      function resolveFeatureFlags() {
+        const defaults = {
+          trig: true,
+          memory: true,
+          circleArea: true,
+        };
+        const stored = loadStoredFlags();
+        const params = new URLSearchParams(window.location.search);
+
+        const resolved = {
+          trig:
+            parseBooleanFlag(params.get("ff_trig")) ??
+            parseBooleanFlag(stored.trig) ??
+            defaults.trig,
+          memory:
+            parseBooleanFlag(params.get("ff_memory")) ??
+            parseBooleanFlag(stored.memory) ??
+            defaults.memory,
+          circleArea:
+            parseBooleanFlag(params.get("ff_circle_area")) ??
+            parseBooleanFlag(stored.circleArea) ??
+            defaults.circleArea,
+        };
+
+        window.calculatorFeatureFlags = resolved;
+        return resolved;
+      }
+
+      function applyFeatureVisibility(flags) {
+        memorySectionEl.hidden = !flags.memory;
+        trigSectionEl.hidden = !flags.trig;
+        circleAreaButtonEl.hidden = !flags.circleArea;
+      }
+
+      const runtimeFlags = resolveFeatureFlags();
+      applyFeatureVisibility(runtimeFlags);
+      const engine = createCalculatorEngine({ featureFlags: runtimeFlags });
 
       // Centralized UI rendering keeps state transitions predictable.
       function render() {
