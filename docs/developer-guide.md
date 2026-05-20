@@ -47,6 +47,35 @@ This guide explains how to run, validate, and extend the calculator project in t
 5. Re-test core flows manually using both mouse and keyboard input when the change affects browser interactions.
 6. Update [README.md](../README.md) when contributor-facing behavior or project structure changes.
 
+## Runtime Feature Flags
+
+The calculator supports runtime feature flags for local validation and controlled behavior checks.
+
+### Query Parameter Flags
+
+- `ff_trig`: Enables or disables trigonometric controls (`sin`, `cos`, `tan`, and angle mode toggle)
+- `ff_memory`: Enables or disables memory controls (`MC`, `MR`, `M+`, `M-`, `MS`)
+- `ff_circle_area`: Enables or disables the `A(r)` circle area shortcut
+
+Accepted values: `1`, `0`, `true`, `false`, `on`, `off`, `yes`, `no`
+
+Examples:
+
+- `calculator.html?ff_trig=0`
+- `calculator.html?ff_memory=0&ff_circle_area=0`
+
+### localStorage Flags
+
+You can define persistent defaults with local storage key `calculator.featureFlags`.
+
+Example value:
+
+```json
+{ "trig": true, "memory": false, "circleArea": true }
+```
+
+Query parameters take precedence over localStorage values.
+
 ## Coding Guidelines
 
 - Keep rendering logic centralized to avoid inconsistent UI state.

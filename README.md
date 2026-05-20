@@ -73,6 +73,23 @@ No build step is required.
 1. Open `calculator.html` in a web browser.
 2. Use the on-screen controls or keyboard shortcuts.
 
+### Runtime Feature Flags
+
+You can toggle selected features at runtime with query parameters:
+
+- `ff_trig`: toggle trig controls (`sin`, `cos`, `tan`, and DEG/RAD toggle)
+- `ff_memory`: toggle memory controls (`MC`, `MR`, `M+`, `M-`, `MS`)
+- `ff_circle_area`: toggle circle area shortcut (`A(r)`)
+
+Accepted values: `1`, `0`, `true`, `false`, `on`, `off`, `yes`, `no`
+
+Examples:
+
+- `calculator.html?ff_trig=0`
+- `calculator.html?ff_memory=0&ff_circle_area=0`
+
+Persistent defaults can be set in localStorage under `calculator.featureFlags` (JSON object). Query parameters override localStorage.
+
 ### Validation
 
 - Verify the calculator display updates when entering digits and operators.
