@@ -427,76 +427,82 @@
         angleModeButtonEl.classList.toggle("active", state.angleMode === "deg");
       }
 
+      const actionHandlers = {
+        clear: () => engine.clearAll(),
+        backspace: () => engine.backspace(),
+        "circle-area": () => engine.calculateCircleArea(),
+        percent: () => engine.calculatePercentage(),
+        "trig-sin": () => engine.applyTrigFunction("sin"),
+        "trig-cos": () => engine.applyTrigFunction("cos"),
+        "trig-tan": () => engine.applyTrigFunction("tan"),
+        "toggle-angle-mode": () => engine.toggleAngleMode(),
+        "memory-clear": () => engine.clearMemory(),
+        "memory-recall": () => engine.recallMemory(),
+        "memory-add": () => engine.adjustMemory(engine.getCurrentValue() ?? 0),
+        "memory-subtract": () => engine.adjustMemory(-(engine.getCurrentValue() ?? 0)),
+        "memory-store": () => engine.storeMemory(),
+        equals: () => engine.evaluate(),
+      };
+
+      function dispatchButtonInput({ action, value }) {
+        if (actionHandlers[action]) {
+          actionHandlers[action]();
+          return;
+        }
+        if (value) {
+          engine.appendValue(value);
+        }
+      }
+
+      function runAndRender(operation) {
+        operation();
+        render();
+      }
+
       buttons.forEach((button) => {
         button.addEventListener("click", () => {
           const { action, value } = button.dataset;
           // Data-driven dispatch keeps button wiring declarative in markup.
-          if (action === "clear") engine.clearAll();
-          else if (action === "backspace") engine.backspace();
-          else if (action === "circle-area") engine.calculateCircleArea();
-          else if (action === "percent") engine.calculatePercentage();
-          else if (action === "trig-sin") engine.applyTrigFunction("sin");
-          else if (action === "trig-cos") engine.applyTrigFunction("cos");
-          else if (action === "trig-tan") engine.applyTrigFunction("tan");
-          else if (action === "toggle-angle-mode") engine.toggleAngleMode();
-          else if (action === "memory-clear") engine.clearMemory();
-          else if (action === "memory-recall") engine.recallMemory();
-          else if (action === "memory-add")
-            engine.adjustMemory(engine.getCurrentValue() ?? 0);
-          else if (action === "memory-subtract")
-            engine.adjustMemory(-(engine.getCurrentValue() ?? 0));
-          else if (action === "memory-store") engine.storeMemory();
-          else if (action === "equals") engine.evaluate();
-          else if (value) engine.appendValue(value);
-
-          render();
+          runAndRender(() => dispatchButtonInput({ action, value }));
         });
       });
 
       document.addEventListener("keydown", (event) => {
         const { key } = event;
+        const keyHandlers = {
+          ".": () => engine.appendValue("."),
+          "+": () => engine.appendValue("+"),
+          "-": () => engine.appendValue("-"),
+          "*": () => engine.appendValue("*"),
+          "/": () => engine.appendValue("/"),
+          "%": () => engine.calculatePercentage(),
+        };
         // Keyboard shortcuts mirror button behavior for parity and accessibility.
         if (/^[0-9]$/.test(key)) {
-          engine.appendValue(key);
-          render();
+          runAndRender(() => engine.appendValue(key));
           return;
         }
-        if (key === ".") {
-          engine.appendValue(key);
-          render();
-          return;
-        }
-        if (["+", "-", "*", "/", "%"].includes(key)) {
-          if (key === "%") {
-            engine.calculatePercentage();
-            render();
-            return;
-          }
-          engine.appendValue(key);
-          render();
+        if (keyHandlers[key]) {
+          runAndRender(keyHandlers[key]);
           return;
         }
         if (key.toLowerCase() === "a") {
           event.preventDefault();
-          engine.calculateCircleArea();
-          render();
+          runAndRender(() => engine.calculateCircleArea());
           return;
         }
         if (key === "Enter" || key === "=") {
           event.preventDefault();
-          engine.evaluate();
-          render();
+          runAndRender(() => engine.evaluate());
           return;
         }
         if (key === "Backspace") {
           event.preventDefault();
-          engine.backspace();
-          render();
+          runAndRender(() => engine.backspace());
           return;
         }
         if (key === "Escape") {
-          engine.clearAll();
-          render();
+          runAndRender(() => engine.clearAll());
         }
       });
 

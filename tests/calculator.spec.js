@@ -100,6 +100,13 @@ test.describe("calculator regression characterization", () => {
     await expect(page.locator("#result")).toHaveText("0");
   });
 
+  test("supports equals key as keyboard evaluate shortcut", async ({ page }) => {
+    await openCalculator(page);
+    await page.keyboard.type("7*6");
+    await page.keyboard.press("=");
+    await expect(page.locator("#result")).toHaveText("42");
+  });
+
   test("recovers from error state after clear", async ({ page }) => {
     await openCalculator(page);
 
