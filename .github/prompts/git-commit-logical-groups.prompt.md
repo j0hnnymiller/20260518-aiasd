@@ -18,7 +18,8 @@ total_duration: "00:10:00"
 ai_log: "ai-logs/2026/05/19/f484659e-32e1-441a-958c-e33d2d7925f1/conversation.md"
 source: "GitHub Copilot Chat"
 mode: agent
-tools: ["search", "read", "edit", "list", "run"]
+agent: .github/agents/git-expert.agent.md
+tools: ["search", "read", "edit", "list", "run", "execute"]
 description: Analyze workspace changes, create logical commit groups, and commit each group with clear Conventional Commit messages.
 prompt_metadata:
   id: git-commit-logical-groups

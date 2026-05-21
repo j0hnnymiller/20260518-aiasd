@@ -70,11 +70,11 @@ Create a reusable prompt file that can regenerate the repository's test-driven-d
 
 ## Artifacts Produced
 
-| Artifact | Type | Purpose |
-| --- | --- | --- |
-| `.github/prompts/test-driven-development-instruction-file-generator.prompt.md` | prompt | Regenerate the TDD instruction file |
-| `ai-logs/2026/05/20/f62cf86f-6857-4562-8b9d-46319d02acd9/conversation.md` | log | Conversation provenance |
-| `ai-logs/2026/05/20/f62cf86f-6857-4562-8b9d-46319d02acd9/summary.md` | summary | Resumable work summary |
+| Artifact                                                                       | Type    | Purpose                             |
+| ------------------------------------------------------------------------------ | ------- | ----------------------------------- |
+| `.github/prompts/test-driven-development-instruction-file-generator.prompt.md` | prompt  | Regenerate the TDD instruction file |
+| `ai-logs/2026/05/20/f62cf86f-6857-4562-8b9d-46319d02acd9/conversation.md`      | log     | Conversation provenance             |
+| `ai-logs/2026/05/20/f62cf86f-6857-4562-8b9d-46319d02acd9/summary.md`           | summary | Resumable work summary              |
 
 ## Lessons Learned
 
