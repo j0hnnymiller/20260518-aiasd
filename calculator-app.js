@@ -211,12 +211,29 @@
     globalScope.calculatorApp = createCalculatorApp({ root }).init();
   }
 
+  function bootCalculatorApp(options = {}) {
+    const documentRef =
+      options.document ?? options.window?.document ?? globalScope.document;
+    const initialize = options.initialize ?? autoInitializeCalculator;
+
+    if (!documentRef) return;
+
+    if (documentRef.readyState === "loading") {
+      documentRef.addEventListener("DOMContentLoaded", initialize, { once: true });
+      return;
+    }
+
+    initialize();
+  }
+
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {
       parseBooleanFlag,
       readStoredFeatureFlags,
       resolveCalculatorFeatureFlags,
       createCalculatorApp,
+      autoInitializeCalculator,
+      bootCalculatorApp,
     };
   }
 
@@ -225,12 +242,6 @@
   globalScope.createCalculatorApp = createCalculatorApp;
 
   if (typeof window !== "undefined") {
-    if (window.document.readyState === "loading") {
-      window.document.addEventListener("DOMContentLoaded", autoInitializeCalculator, {
-        once: true,
-      });
-    } else {
-      autoInitializeCalculator();
-    }
+    bootCalculatorApp({ window });
   }
 })(typeof window !== "undefined" ? window : globalThis);
