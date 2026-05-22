@@ -239,8 +239,12 @@
     const engineFactory =
       options.engineFactory ?? globalScope.createCalculatorEngine;
     const appFactory = options.createApp ?? createCalculatorApp;
+    const hasQuerySelector = typeof documentRef?.querySelector === "function";
     const root =
-      options.root ?? documentRef?.querySelector?.('[data-role="calculator"]');
+      options.root ??
+      (hasQuerySelector
+        ? documentRef.querySelector('[data-role="calculator"]')
+        : null);
 
     if (!documentRef || !root || typeof engineFactory !== "function") return null;
 
