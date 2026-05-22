@@ -37,12 +37,13 @@ test.describe("calculator regression characterization", () => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
 
-    await page.goto(indexUrl);
-    await expect(page).toHaveURL(/calculator\.html$/);
-    await expect(page.locator("#result")).toHaveText("0");
-
-    await context.close();
-  });
+    try {
+      await page.goto(indexUrl);
+      await expect(page).toHaveURL(/calculator\.html$/);
+      await expect(page.locator("#result")).toHaveText("0");
+    } finally {
+      await context.close();
+    }
 
   test("exposes calculator engine factory on window", async ({ page }) => {
     await openCalculator(page);
