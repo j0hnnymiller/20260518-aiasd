@@ -84,27 +84,27 @@
       return element;
     }
 
-    const historyEl = requireElement('[data-role="history"]', "a history display");
-    const resultEl = requireElement('[data-role="result"]', "a result display");
+    const historyEl = requireElement('[data-role="history"]', "the history display");
+    const resultEl = requireElement('[data-role="result"]', "the result display");
     const memoryIndicatorEl = requireElement(
       '[data-role="memory-indicator"]',
-      "a memory indicator",
+      "the memory indicator",
     );
     const angleModeButtonEl = requireElement(
       '[data-role="angle-mode"]',
-      "an angle mode button",
+      "the angle mode button",
     );
     const memorySectionEl = requireElement(
       '[data-role="memory-section"]',
-      "a memory section",
+      "the memory section",
     );
     const trigSectionEl = requireElement(
       '[data-role="trig-section"]',
-      "a trigonometric section",
+      "the trigonometric section",
     );
     const circleAreaButtonEl = requireElement(
       '[data-action="circle-area"]',
-      "a circle area button",
+      "the circle area button",
     );
     const engine = engineFactory({ featureFlags });
 

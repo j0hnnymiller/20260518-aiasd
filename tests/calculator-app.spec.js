@@ -33,7 +33,7 @@ test.describe("calculator app module", () => {
           },
         }),
       }),
-    ).toThrow("calculator app requires a history display");
+    ).toThrow("calculator app requires the history display");
   });
 
   test("parses supported boolean-like flag values", () => {
