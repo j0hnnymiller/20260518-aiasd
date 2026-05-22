@@ -12,6 +12,10 @@
 - [Web calculator vertical slices](specs/web-calculator-vertical-slices.md) - implementation breakdown from core arithmetic through optional phase 2 features
 - [Web calculator implementation plan](specs/web-calculator-implementation-plan.md) - phased execution plan with acceptance gates, priorities, and delivery metrics
 - [Slice 1 implementation promptfile](.github/prompts/implement-slice-1.prompt.md) - reusable Copilot prompt to implement Slice 1 with verification and stakeholder showcase steps
+- [Slice 4 implementation promptfile](.github/prompts/implement-slice-4.prompt.md) - reusable Copilot prompt to implement Slice 4 percentage workflow with verification and stakeholder showcase steps
+- [Slice 3 implementation promptfile](.github/prompts/implement-slice-3.prompt.md) - reusable Copilot prompt to implement Slice 3 error handling and validation with verification and stakeholder showcase steps
+- [Slice 2 implementation promptfile](.github/prompts/implement-slice-2.prompt.md) - reusable Copilot prompt to implement Slice 2 editing and keyboard parity with verification and stakeholder showcase steps
+- [Slice 5 implementation promptfile](.github/prompts/implement-slice-5.prompt.md) - reusable Copilot prompt to implement Slice 5 accessibility and responsive polish with verification and stakeholder showcase steps
 
 ## Provenance
 
@@ -25,3 +29,11 @@
 - [Stakeholder showcase instruction session summary](ai-logs/2026/05/22/stakeholder-showcase-instructions-20260522/summary.md)
 - [Slice 1 promptfile conversation log](ai-logs/2026/05/22/slice-1-implementation-prompt-20260522/conversation.md)
 - [Slice 1 promptfile session summary](ai-logs/2026/05/22/slice-1-implementation-prompt-20260522/summary.md)
+- [Slice 4 promptfile conversation log](ai-logs/2026/05/22/slice-4-implementation-prompt-20260522/conversation.md)
+- [Slice 4 promptfile session summary](ai-logs/2026/05/22/slice-4-implementation-prompt-20260522/summary.md)
+- [Slice 3 promptfile conversation log](ai-logs/2026/05/22/slice-3-implementation-prompt-20260522/conversation.md)
+- [Slice 3 promptfile session summary](ai-logs/2026/05/22/slice-3-implementation-prompt-20260522/summary.md)
+- [Slice 2 promptfile conversation log](ai-logs/2026/05/22/slice-2-implementation-prompt-20260522/conversation.md)
+- [Slice 2 promptfile session summary](ai-logs/2026/05/22/slice-2-implementation-prompt-20260522/summary.md)
+- [Slice 5 promptfile conversation log](ai-logs/2026/05/22/slice-5-implementation-prompt-20260522/conversation.md)
+- [Slice 5 promptfile session summary](ai-logs/2026/05/22/slice-5-implementation-prompt-20260522/summary.md)
