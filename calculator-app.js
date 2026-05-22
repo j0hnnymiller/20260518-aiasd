@@ -288,11 +288,11 @@
     };
   }
 
-  globalScope.parseBooleanFlag = parseBooleanFlag;
-  globalScope.resolveCalculatorFeatureFlags = resolveCalculatorFeatureFlags;
-  globalScope.createCalculatorApp = createCalculatorApp;
-
   if (typeof window !== "undefined") {
+    globalScope.parseBooleanFlag = parseBooleanFlag;
+    globalScope.resolveCalculatorFeatureFlags = resolveCalculatorFeatureFlags;
+    globalScope.createCalculatorApp = createCalculatorApp;
+
     bootCalculatorApp({ window });
   }
 })(typeof window !== "undefined" ? window : globalThis);
