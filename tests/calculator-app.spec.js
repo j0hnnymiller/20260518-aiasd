@@ -4,6 +4,7 @@ const {
   parseBooleanFlag,
   resolveCalculatorFeatureFlags,
   createCalculatorApp,
+  autoInitializeCalculator,
   bootCalculatorApp,
 } = require("../calculator-app.js");
 
@@ -12,11 +13,13 @@ test.describe("calculator app module", () => {
     expect(typeof createCalculatorApp).toBe("function");
   });
 
-  test("resolves feature flags with query params overriding stored flags", () => {
+  test("parses supported boolean-like flag values", () => {
     expect(parseBooleanFlag("yes")).toBe(true);
     expect(parseBooleanFlag("off")).toBe(false);
     expect(parseBooleanFlag("maybe")).toBeNull();
+  });
 
+  test("resolves feature flags with query params overriding stored flags", () => {
     expect(
       resolveCalculatorFeatureFlags({
         search: "?ff_trig=0&ff_circle_area=1",
@@ -58,6 +61,51 @@ test.describe("calculator app module", () => {
     });
 
     expect(calls).toEqual(["init"]);
+  });
+
+  test("initializes the calculator app when the DOM root and engine are available", () => {
+    const root = {};
+    const document = {
+      querySelector(selector) {
+        return selector === '[data-role="calculator"]' ? root : null;
+      },
+    };
+    const engineFactory = () => ({});
+    const calls = [];
+
+    const app = autoInitializeCalculator({
+      document,
+      engineFactory,
+      createApp(options) {
+        calls.push(options);
+        return {
+          init() {
+            return { initialized: true };
+          },
+        };
+      },
+    });
+
+    expect(app).toEqual({ initialized: true });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].root).toBe(root);
+    expect(calls[0].document).toBe(document);
+    expect(calls[0].engineFactory).toBe(engineFactory);
+  });
+
+  test("skips initialization when dependencies are missing", () => {
+    expect(
+      autoInitializeCalculator({
+        document: { querySelector: () => null },
+        engineFactory: () => ({}),
+      }),
+    ).toBeNull();
+
+    expect(
+      autoInitializeCalculator({
+        document: { querySelector: () => ({}) },
+      }),
+    ).toBeNull();
   });
 
   test("waits for DOMContentLoaded when the document is still loading", () => {

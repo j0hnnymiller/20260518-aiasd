@@ -204,11 +204,27 @@
     return api;
   }
 
-  function autoInitializeCalculator() {
-    if (!globalScope.document) return;
-    const root = globalScope.document.querySelector('[data-role="calculator"]');
-    if (!root || typeof globalScope.createCalculatorEngine !== "function") return;
-    globalScope.calculatorApp = createCalculatorApp({ root }).init();
+  function autoInitializeCalculator(options = {}) {
+    const documentRef = options.document ?? globalScope.document;
+    const engineFactory =
+      options.engineFactory ?? globalScope.createCalculatorEngine;
+    const appFactory = options.createApp ?? createCalculatorApp;
+    const root =
+      options.root ?? documentRef?.querySelector?.('[data-role="calculator"]');
+
+    if (!documentRef || !root || typeof engineFactory !== "function") return null;
+
+    const app = appFactory({
+      root,
+      document: documentRef,
+      engineFactory,
+      search: options.search ?? globalScope.location?.search ?? "",
+      storage: options.storage ?? globalScope.localStorage,
+      storageKey: options.storageKey,
+    }).init();
+
+    globalScope.calculatorApp = app;
+    return app;
   }
 
   function bootCalculatorApp(options = {}) {
@@ -229,7 +245,6 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {
       parseBooleanFlag,
-      readStoredFeatureFlags,
       resolveCalculatorFeatureFlags,
       createCalculatorApp,
       autoInitializeCalculator,
