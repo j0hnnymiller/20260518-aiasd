@@ -257,7 +257,9 @@
       storageKey: options.storageKey,
     }).init();
 
-    globalScope.calculatorApp = app;
+    if (typeof window !== "undefined") {
+      globalScope.calculatorApp = app;
+    }
     return app;
   }
 
