@@ -76,13 +76,36 @@
         storageKey: options.storageKey,
       });
 
-    const historyEl = root.querySelector('[data-role="history"]');
-    const resultEl = root.querySelector('[data-role="result"]');
-    const memoryIndicatorEl = root.querySelector('[data-role="memory-indicator"]');
-    const angleModeButtonEl = root.querySelector('[data-role="angle-mode"]');
-    const memorySectionEl = root.querySelector('[data-role="memory-section"]');
-    const trigSectionEl = root.querySelector('[data-role="trig-section"]');
-    const circleAreaButtonEl = root.querySelector('[data-action="circle-area"]');
+    function requireElement(selector, label) {
+      const element = root.querySelector(selector);
+      if (!element) {
+        throw new Error(`calculator app requires ${label}`);
+      }
+      return element;
+    }
+
+    const historyEl = requireElement('[data-role="history"]', "a history display");
+    const resultEl = requireElement('[data-role="result"]', "a result display");
+    const memoryIndicatorEl = requireElement(
+      '[data-role="memory-indicator"]',
+      "a memory indicator",
+    );
+    const angleModeButtonEl = requireElement(
+      '[data-role="angle-mode"]',
+      "an angle mode button",
+    );
+    const memorySectionEl = requireElement(
+      '[data-role="memory-section"]',
+      "a memory section",
+    );
+    const trigSectionEl = requireElement(
+      '[data-role="trig-section"]',
+      "a trigonometric section",
+    );
+    const circleAreaButtonEl = requireElement(
+      '[data-action="circle-area"]',
+      "a circle area button",
+    );
     const engine = engineFactory({ featureFlags });
 
     function render() {
@@ -104,24 +127,31 @@
       circleAreaButtonEl.hidden = !featureFlags.circleArea;
     }
 
+    const actionHandlers = {
+      clear: () => engine.clearAll(),
+      backspace: () => engine.backspace(),
+      "circle-area": () => engine.calculateCircleArea(),
+      percent: () => engine.calculatePercentage(),
+      "trig-sin": () => engine.applyTrigFunction("sin"),
+      "trig-cos": () => engine.applyTrigFunction("cos"),
+      "trig-tan": () => engine.applyTrigFunction("tan"),
+      "toggle-angle-mode": () => engine.toggleAngleMode(),
+      "memory-clear": () => engine.clearMemory(),
+      "memory-recall": () => engine.recallMemory(),
+      "memory-add": () => engine.adjustMemory(engine.getCurrentValue() ?? 0),
+      "memory-subtract": () =>
+        engine.adjustMemory(-(engine.getCurrentValue() ?? 0)),
+      "memory-store": () => engine.storeMemory(),
+      equals: () => engine.evaluate(),
+    };
+
     function dispatchAction(action, value) {
-      if (action === "clear") engine.clearAll();
-      else if (action === "backspace") engine.backspace();
-      else if (action === "circle-area") engine.calculateCircleArea();
-      else if (action === "percent") engine.calculatePercentage();
-      else if (action === "trig-sin") engine.applyTrigFunction("sin");
-      else if (action === "trig-cos") engine.applyTrigFunction("cos");
-      else if (action === "trig-tan") engine.applyTrigFunction("tan");
-      else if (action === "toggle-angle-mode") engine.toggleAngleMode();
-      else if (action === "memory-clear") engine.clearMemory();
-      else if (action === "memory-recall") engine.recallMemory();
-      else if (action === "memory-add")
-        engine.adjustMemory(engine.getCurrentValue() ?? 0);
-      else if (action === "memory-subtract")
-        engine.adjustMemory(-(engine.getCurrentValue() ?? 0));
-      else if (action === "memory-store") engine.storeMemory();
-      else if (action === "equals") engine.evaluate();
-      else if (value) engine.appendValue(value);
+      const handler = action ? actionHandlers[action] : null;
+      if (handler) {
+        handler();
+      } else if (value) {
+        engine.appendValue(value);
+      }
       render();
     }
 

@@ -13,6 +13,29 @@ test.describe("calculator app module", () => {
     expect(typeof createCalculatorApp).toBe("function");
   });
 
+  test("throws a helpful error when required UI nodes are missing", () => {
+    expect(() =>
+      createCalculatorApp({
+        document: {},
+        root: {
+          querySelector() {
+            return null;
+          },
+        },
+        engineFactory: () => ({
+          getSnapshot() {
+            return {
+              displayExpression: "",
+              lastResult: "0",
+              memoryValue: null,
+              angleMode: "deg",
+            };
+          },
+        }),
+      }),
+    ).toThrow("calculator app requires a history display");
+  });
+
   test("parses supported boolean-like flag values", () => {
     expect(parseBooleanFlag("yes")).toBe(true);
     expect(parseBooleanFlag("off")).toBe(false);
