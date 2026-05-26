@@ -51,6 +51,7 @@ This document defines HTML authoring rules for this repository. Use these instru
 
 - Use `data-*` attributes for JavaScript hooks instead of relying on `id` or `class` selectors.
 - Avoid inline JavaScript (`onclick`, `onchange`); use event listeners in external scripts.
+- For page-entry redirects, keep HTML declarative and place redirect logic in an external script file referenced with `src`.
 - Ensure hooks are descriptive and unique, e.g., `data-action="submit-form"`.
 
 ## Accessibility Requirements
@@ -76,6 +77,7 @@ This document defines HTML authoring rules for this repository. Use these instru
 
 - Using `div` or `span` for buttons or links.
 - Inline styles or JavaScript.
+- Inline `<script>` redirect blocks in entrypoint HTML files.
 - Skipping heading levels (e.g., `h1` directly followed by `h3`).
 - Over-reliance on `id` for styling or scripting.
 - Empty or redundant `alt` attributes on images.
@@ -86,6 +88,7 @@ This document defines HTML authoring rules for this repository. Use these instru
 - [ ] All interactive elements are accessible via keyboard and screen readers.
 - [ ] JavaScript hooks use `data-*` attributes.
 - [ ] No inline styles or JavaScript.
+- [ ] Redirect scripts are loaded from external files, not inline blocks.
 - [ ] Headings follow a logical hierarchy.
 - [ ] Forms have associated labels.
 - [ ] Images have meaningful `alt` attributes.

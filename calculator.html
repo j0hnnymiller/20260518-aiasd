@@ -4,503 +4,126 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculator</title>
-    <style>
-      /* Design tokens keep the visual theme consistent across controls and states. */
-      :root {
-        color-scheme: dark;
-        --bg: #0b1020;
-        --bg-2: #121a33;
-        --panel: rgba(18, 26, 51, 0.82);
-        --panel-border: rgba(255, 255, 255, 0.1);
-        --text: #f4f7ff;
-        --muted: #9ca8c7;
-        --accent: #6ee7ff;
-        --accent-strong: #7c8cff;
-        --danger: #ff7b8a;
-        --key: #18213d;
-        --key-hover: #223055;
-        --key-operator: #24345f;
-        --key-operator-hover: #2f4580;
-        --key-equals: linear-gradient(135deg, #6ee7ff, #7c8cff);
-        --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        color: var(--text);
-        /* Layered gradients create depth while keeping the UI lightweight. */
-        background:
-          radial-gradient(
-            circle at top left,
-            rgba(110, 231, 255, 0.2),
-            transparent 28%
-          ),
-          radial-gradient(
-            circle at bottom right,
-            rgba(59, 130, 246, 0.22),
-            transparent 30%
-          ),
-          linear-gradient(135deg, #0b1f4d, #123a8c 55%, #1d4ed8);
-        padding: 24px;
-      }
-
-      .calculator {
-        width: min(100%, 420px);
-        border: 1px solid var(--panel-border);
-        border-radius: 28px;
-        background: var(--panel);
-        backdrop-filter: blur(18px);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-      }
-
-      .header {
-        padding: 22px 22px 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-      }
-
-      .brand {
-        display: grid;
-        gap: 4px;
-      }
-
-      .brand h1 {
-        margin: 0;
-        font-size: 1.05rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .brand p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-
-      .memory-indicator {
-        min-width: 32px;
-        text-align: right;
-        color: var(--accent);
-        font-size: 0.9rem;
-        font-weight: 700;
-        opacity: 0;
-        transition: opacity 0.18s ease;
-      }
-
-      .memory-indicator.active {
-        opacity: 1;
-      }
-
-      .display {
-        padding: 12px 22px 18px;
-      }
-
-      .history {
-        min-height: 24px;
-        color: var(--muted);
-        font-size: 0.95rem;
-        text-align: right;
-        overflow-wrap: anywhere;
-      }
-
-      .result {
-        min-height: 64px;
-        margin-top: 8px;
-        display: flex;
-        align-items: end;
-        justify-content: flex-end;
-        font-size: clamp(2rem, 6vw, 3.2rem);
-        font-weight: 700;
-        text-align: right;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-      }
-
-      .keys {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        padding: 18px 22px 22px;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.02),
-          rgba(255, 255, 255, 0)
-        );
-      }
-
-      .memory-keys {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-        padding: 0 22px 12px;
-      }
-
-      .trig-keys {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        padding: 0 22px 12px;
-      }
-
-      button {
-        appearance: none;
-        border: 0;
-        border-radius: 18px;
-        min-height: 64px;
-        color: var(--text);
-        font: inherit;
-        font-size: 1.08rem;
-        font-weight: 600;
-        background: var(--key);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-        transition:
-          transform 0.08s ease,
-          background 0.18s ease,
-          box-shadow 0.18s ease;
-        cursor: pointer;
-        user-select: none;
-      }
-
-      button:hover {
-        background: var(--key-hover);
-      }
-
-      button:active {
-        transform: translateY(1px) scale(0.99);
-      }
-
-      button:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-      }
-
-      .operator {
-        background: var(--key-operator);
-      }
-
-      .operator:hover {
-        background: var(--key-operator-hover);
-      }
-
-      .danger {
-        color: #ffd8de;
-        background: linear-gradient(
-          135deg,
-          rgba(255, 123, 138, 0.24),
-          rgba(255, 123, 138, 0.15)
-        );
-      }
-
-      .equals {
-        background: var(--key-equals);
-        color: #08111f;
-        box-shadow: 0 12px 24px rgba(110, 231, 255, 0.2);
-      }
-
-      .memory-button {
-        min-height: 48px;
-        border-radius: 14px;
-        font-size: 0.92rem;
-      }
-
-      .mode-button.active {
-        background: var(--accent);
-        color: #08111f;
-      }
-
-      .span-2 {
-        grid-column: span 2;
-      }
-
-      [hidden] {
-        display: none !important;
-      }
-
-      .hint {
-        padding: 0 22px 22px;
-        color: var(--muted);
-        font-size: 0.85rem;
-        text-align: center;
-      }
-
-      @media (max-width: 420px) {
-        /* Tighten spacing and hit targets for smaller screens. */
-        .calculator {
-          border-radius: 24px;
-        }
-
-        .keys {
-          gap: 10px;
-          padding: 16px;
-        }
-
-        .display,
-        .header {
-          padding-left: 16px;
-          padding-right: 16px;
-        }
-
-        button {
-          min-height: 58px;
-          border-radius: 16px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="calculator.css" />
+    <script defer src="calculator-engine.js"></script>
+    <script defer src="calculator-app.js"></script>
   </head>
   <body>
-    <main class="calculator" aria-label="Calculator">
-      <div class="header">
-        <div class="brand">
-          <h1>Calculator</h1>
-          <p>Keyboard ready • Press A for circle area</p>
-        </div>
-        <div class="memory-indicator" id="memory-indicator">M</div>
-      </div>
+    <main class="app-shell">
+      <section class="calculator" data-role="calculator" aria-label="Calculator">
+        <section class="calculator__top">
+          <header class="brand">
+            <div>
+              <h1>Calculator</h1>
+              <p>Keyboard ready • Press A for circle area</p>
+            </div>
+            <div
+              class="memory-indicator"
+              id="memory-indicator"
+              data-role="memory-indicator"
+              aria-hidden="true"
+            >
+              M
+            </div>
+          </header>
 
-      <section class="display" aria-live="polite">
-        <div class="history" id="history">&nbsp;</div>
-        <div class="result" id="result">0</div>
+          <section class="display-panel">
+            <output class="history" id="history" data-role="history">&nbsp;</output>
+            <output
+              class="result"
+              id="result"
+              data-role="result"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              0
+            </output>
+          </section>
+        </section>
+
+        <section class="calculator__controls">
+          <section
+            class="memory-keys"
+            data-role="memory-section"
+            aria-label="Calculator memory keys"
+          >
+            <button class="memory-button operator" data-action="memory-clear">
+              MC
+            </button>
+            <button class="memory-button operator" data-action="memory-recall">
+              MR
+            </button>
+            <button class="memory-button operator" data-action="memory-add">
+              M+
+            </button>
+            <button
+              class="memory-button operator"
+              data-action="memory-subtract"
+            >
+              M-
+            </button>
+            <button class="memory-button operator" data-action="memory-store">
+              MS
+            </button>
+          </section>
+
+          <section
+            class="trig-keys"
+            data-role="trig-section"
+            aria-label="Calculator trigonometric keys"
+          >
+            <button class="memory-button operator" data-action="trig-sin">
+              sin
+            </button>
+            <button class="memory-button operator" data-action="trig-cos">
+              cos
+            </button>
+            <button class="memory-button operator" data-action="trig-tan">
+              tan
+            </button>
+            <button
+              class="memory-button operator mode-button"
+              id="angle-mode-button"
+              data-role="angle-mode"
+              data-action="toggle-angle-mode"
+            >
+              DEG
+            </button>
+          </section>
+
+          <section class="keys" aria-label="Calculator keys">
+            <button class="danger" data-action="clear">AC</button>
+            <button class="operator" data-action="backspace">⌫</button>
+            <button class="operator" data-action="circle-area">A(r)</button>
+            <button class="operator" data-action="percent">%</button>
+
+            <button class="operator" data-value="/">÷</button>
+            <button data-value="7">7</button>
+            <button data-value="8">8</button>
+            <button data-value="9">9</button>
+
+            <button class="operator" data-value="*">×</button>
+            <button data-value="4">4</button>
+            <button data-value="5">5</button>
+            <button data-value="6">6</button>
+
+            <button class="operator" data-value="-">−</button>
+            <button data-value="1">1</button>
+            <button data-value="2">2</button>
+            <button data-value="3">3</button>
+
+            <button class="operator" data-value="+">+</button>
+            <button data-value="0">0</button>
+            <button data-value=".">.</button>
+            <button class="equals" data-action="equals">=</button>
+          </section>
+
+          <p class="hint">
+            Use the number keys, operators, memory keys, Enter, Backspace, Esc,
+            and A. Trig functions use the selected angle mode.
+          </p>
+        </section>
       </section>
-
-      <section class="memory-keys" aria-label="Calculator memory keys">
-        <button class="operator memory-button" data-action="memory-clear">
-          MC
-        </button>
-        <button class="operator memory-button" data-action="memory-recall">
-          MR
-        </button>
-        <button class="operator memory-button" data-action="memory-add">
-          M+
-        </button>
-        <button class="operator memory-button" data-action="memory-subtract">
-          M-
-        </button>
-        <button class="operator memory-button" data-action="memory-store">
-          MS
-        </button>
-      </section>
-
-      <section class="trig-keys" aria-label="Calculator trigonometric keys">
-        <button class="operator memory-button" data-action="trig-sin">
-          sin
-        </button>
-        <button class="operator memory-button" data-action="trig-cos">
-          cos
-        </button>
-        <button class="operator memory-button" data-action="trig-tan">
-          tan
-        </button>
-        <button
-          class="operator memory-button mode-button"
-          data-action="toggle-angle-mode"
-          id="angle-mode-button"
-        >
-          DEG
-        </button>
-      </section>
-
-      <section class="keys" aria-label="Calculator keys">
-        <button class="danger" data-action="clear">AC</button>
-        <button class="operator" data-action="backspace">⌫</button>
-        <button class="operator" data-action="circle-area">A(r)</button>
-        <button class="operator" data-action="percent">%</button>
-        <button class="operator" data-value="/">÷</button>
-
-        <button data-value="7">7</button>
-        <button data-value="8">8</button>
-        <button data-value="9">9</button>
-        <button class="operator" data-value="*">×</button>
-
-        <button data-value="4">4</button>
-        <button data-value="5">5</button>
-        <button data-value="6">6</button>
-        <button class="operator" data-value="-">−</button>
-
-        <button data-value="1">1</button>
-        <button data-value="2">2</button>
-        <button data-value="3">3</button>
-        <button class="operator" data-value="+">+</button>
-
-        <button data-value="0">0</button>
-        <button data-value=".">.</button>
-        <button class="equals" data-action="equals">=</button>
-      </section>
-
-      <div class="hint">
-        Use the number keys, operators, memory keys, Enter, Backspace, Esc, and
-        A. Trig functions use the selected angle mode.
-      </div>
     </main>
-
-    <script src="calculator-engine.js"></script>
-    <script>
-      const historyEl = document.getElementById("history");
-      const resultEl = document.getElementById("result");
-      const memoryIndicatorEl = document.getElementById("memory-indicator");
-      const angleModeButtonEl = document.getElementById("angle-mode-button");
-      const memorySectionEl = document.querySelector(".memory-keys");
-      const trigSectionEl = document.querySelector(".trig-keys");
-      const circleAreaButtonEl = document.querySelector(
-        '[data-action="circle-area"]',
-      );
-      const buttons = document.querySelectorAll("button");
-
-      function parseBooleanFlag(value) {
-        if (value === null || value === undefined) return null;
-        const normalized = String(value).toLowerCase();
-        if (["1", "true", "on", "yes"].includes(normalized)) return true;
-        if (["0", "false", "off", "no"].includes(normalized)) return false;
-        return null;
-      }
-
-      function loadStoredFlags() {
-        try {
-          const raw = localStorage.getItem("calculator.featureFlags");
-          if (!raw) return {};
-          const parsed = JSON.parse(raw);
-          if (!parsed || typeof parsed !== "object") return {};
-          return parsed;
-        } catch {
-          return {};
-        }
-      }
-
-      function resolveFeatureFlags() {
-        const defaults = {
-          trig: true,
-          memory: true,
-          circleArea: true,
-        };
-        const stored = loadStoredFlags();
-        const params = new URLSearchParams(window.location.search);
-
-        const resolved = {
-          trig:
-            parseBooleanFlag(params.get("ff_trig")) ??
-            parseBooleanFlag(stored.trig) ??
-            defaults.trig,
-          memory:
-            parseBooleanFlag(params.get("ff_memory")) ??
-            parseBooleanFlag(stored.memory) ??
-            defaults.memory,
-          circleArea:
-            parseBooleanFlag(params.get("ff_circle_area")) ??
-            parseBooleanFlag(stored.circleArea) ??
-            defaults.circleArea,
-        };
-
-        window.calculatorFeatureFlags = resolved;
-        return resolved;
-      }
-
-      function applyFeatureVisibility(flags) {
-        memorySectionEl.hidden = !flags.memory;
-        trigSectionEl.hidden = !flags.trig;
-        circleAreaButtonEl.hidden = !flags.circleArea;
-      }
-
-      const runtimeFlags = resolveFeatureFlags();
-      applyFeatureVisibility(runtimeFlags);
-      const engine = createCalculatorEngine({ featureFlags: runtimeFlags });
-
-      // Centralized UI rendering keeps state transitions predictable.
-      function render() {
-        const state = engine.getSnapshot();
-        historyEl.textContent = state.displayExpression || "\u00A0";
-        resultEl.textContent = state.lastResult;
-        memoryIndicatorEl.classList.toggle(
-          "active",
-          state.memoryValue !== null,
-        );
-        angleModeButtonEl.textContent = state.angleMode.toUpperCase();
-        angleModeButtonEl.classList.toggle("active", state.angleMode === "deg");
-      }
-
-      buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const { action, value } = button.dataset;
-          // Data-driven dispatch keeps button wiring declarative in markup.
-          if (action === "clear") engine.clearAll();
-          else if (action === "backspace") engine.backspace();
-          else if (action === "circle-area") engine.calculateCircleArea();
-          else if (action === "percent") engine.calculatePercentage();
-          else if (action === "trig-sin") engine.applyTrigFunction("sin");
-          else if (action === "trig-cos") engine.applyTrigFunction("cos");
-          else if (action === "trig-tan") engine.applyTrigFunction("tan");
-          else if (action === "toggle-angle-mode") engine.toggleAngleMode();
-          else if (action === "memory-clear") engine.clearMemory();
-          else if (action === "memory-recall") engine.recallMemory();
-          else if (action === "memory-add")
-            engine.adjustMemory(engine.getCurrentValue() ?? 0);
-          else if (action === "memory-subtract")
-            engine.adjustMemory(-(engine.getCurrentValue() ?? 0));
-          else if (action === "memory-store") engine.storeMemory();
-          else if (action === "equals") engine.evaluate();
-          else if (value) engine.appendValue(value);
-
-          render();
-        });
-      });
-
-      document.addEventListener("keydown", (event) => {
-        const { key } = event;
-        // Keyboard shortcuts mirror button behavior for parity and accessibility.
-        if (/^[0-9]$/.test(key)) {
-          engine.appendValue(key);
-          render();
-          return;
-        }
-        if (key === ".") {
-          engine.appendValue(key);
-          render();
-          return;
-        }
-        if (["+", "-", "*", "/", "%"].includes(key)) {
-          if (key === "%") {
-            engine.calculatePercentage();
-            render();
-            return;
-          }
-          engine.appendValue(key);
-          render();
-          return;
-        }
-        if (key.toLowerCase() === "a") {
-          event.preventDefault();
-          engine.calculateCircleArea();
-          render();
-          return;
-        }
-        if (key === "Enter" || key === "=") {
-          event.preventDefault();
-          engine.evaluate();
-          render();
-          return;
-        }
-        if (key === "Backspace") {
-          event.preventDefault();
-          engine.backspace();
-          render();
-          return;
-        }
-        if (key === "Escape") {
-          engine.clearAll();
-          render();
-        }
-      });
-
-      render();
-    </script>
   </body>
 </html>

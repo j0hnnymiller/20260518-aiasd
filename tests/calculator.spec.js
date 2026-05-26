@@ -5,6 +5,9 @@ const { pathToFileURL } = require("node:url");
 const calculatorUrl = pathToFileURL(
   path.resolve(__dirname, "..", "calculator.html"),
 ).toString();
+const indexUrl = pathToFileURL(
+  path.resolve(__dirname, "..", "index.html"),
+).toString();
 
 async function openCalculator(page, query = "") {
   await page.goto(query ? `${calculatorUrl}${query}` : calculatorUrl);
@@ -21,6 +24,27 @@ async function resultText(page) {
 }
 
 test.describe("calculator regression characterization", () => {
+  test("redirects from index entrypoint to calculator", async ({ page }) => {
+    await page.goto(indexUrl);
+    await expect(page).toHaveURL(/calculator\.html$/);
+    await expect(page.locator("h1")).toHaveText("Calculator");
+    await expect(page.locator("#result")).toHaveText("0");
+  });
+
+  test("redirects from index entrypoint when JavaScript is disabled", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+
+    try {
+      await page.goto(indexUrl);
+      await expect(page).toHaveURL(/calculator\.html$/);
+      await expect(page.locator("#result")).toHaveText("0");
+    } finally {
+      await context.close();
+    }
+
   test("exposes calculator engine factory on window", async ({ page }) => {
     await openCalculator(page);
     const hasFactory = await page.evaluate(
